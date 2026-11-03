@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2c7a68" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#111a17" media="(prefers-color-scheme: dark)">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>たんぼっち</title>
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+  <div id="app">
+    <div id="hud" class="hud"></div>
+    <div class="stage">
+      <svg id="sv" viewBox="0 0 360 300" role="img" aria-label="田んぼの断面。水の中を生き物が泳ぎ、稲が育つ">
+        <defs>
+          <linearGradient id="sk" x1="0" y1="0" x2="0" y2="1">
+            <stop id="s1" offset="0"/>
+            <stop id="s2" offset="1"/>
+          </linearGradient>
+          <linearGradient id="wg" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#9bd5df" stop-opacity=".62"/>
+            <stop offset="1" stop-color="#3f8a96" stop-opacity=".82"/>
+          </linearGradient>
+        </defs>
+        <rect width="360" height="300" fill="url(#sk)"/>
+        <circle cx="305" cy="46" r="17" fill="#fff6c8" opacity=".9"/>
+        <g class="cl">
+          <ellipse cx="40" cy="40" rx="26" ry="8" fill="#fff" opacity=".75"/>
+          <ellipse cx="58" cy="35" rx="16" ry="8" fill="#fff" opacity=".75"/>
+        </g>
+        <path d="M0 170Q70 120 140 160T270 150T360 165V262H0Z" fill="#5a8c6e" opacity=".35"/>
+        <g id="rice"></g>
+        <rect id="wtr" x="0" width="360" fill="url(#wg)"/>
+        <path id="wl" stroke="#fff" stroke-opacity=".8" stroke-width="1.5" fill="none"/>
+        <g id="crs"></g>
+        <path id="hay" d="M20 262l10-26 6 12 8-16 8 30z" fill="#c9a85a"/>
+        <rect y="262" width="360" height="38" fill="#6d5a41"/>
+        <path d="M0 270Q60 264 120 272T240 270T360 272V300H0Z" fill="#54442f"/>
+        <g id="tags"></g>
+        <g id="rp"></g>
+        <g id="bug" class="bug">
+          <ellipse rx="8" ry="1.5" fill="#3f7f90"/>
+          <ellipse cx="-1" cy="-3" rx="6" ry="2" fill="#dcf0f4" opacity=".8" transform="rotate(-14)"/>
+        </g>
+        <g id="hn" style="display:none">
+          <g id="hi">
+            <path d="M-3 0V-32M5 0V-32" stroke="#e0b24a" stroke-width="2"/>
+            <ellipse cx="0" cy="-40" rx="15" ry="9" fill="#f4f6f4"/>
+            <path d="M0 -42Q12 -42 16 -34Q6 -34 0 -38Z" fill="#9aa6a8"/>
+            <g id="nk">
+              <path d="M-8 -44Q-24 -52 -16 -68" stroke="#f4f6f4" stroke-width="5" fill="none" stroke-linecap="round"/>
+              <circle cx="-18" cy="-70" r="4.5" fill="#f4f6f4"/>
+              <path d="M-21 -71L-44 -68L-21 -66Z" fill="#e8b84a"/>
+              <circle cx="-19" cy="-71" r="1" fill="#222"/>
+            </g>
+          </g>
+        </g>
+      </svg>
+      <div id="toast" class="toast"></div>
+      <div class="ov">
+        <button data-a="dex">図鑑</button>
+        <button data-a="log">きろく</button>
+      </div>
+    </div>
+    <div id="chips" class="chips"></div>
+    <div id="info"></div>
+  </div>
+  <div id="dock"></div>
+  <div id="sb"><div id="sh"></div></div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
