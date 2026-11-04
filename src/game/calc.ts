@@ -1,6 +1,14 @@
-import { Creature, Trait } from '../types';
+import { Creature, Trait, Rng } from '../types';
 import { SP } from '../data/species';
 import { S } from './state';
+
+let currentRng: Rng = Math.random;
+
+export const setRng = (rng: Rng): void => {
+  currentRng = rng;
+};
+export const getRng = (): Rng => currentRng;
+export const random = (): number => currentRng();
 
 export const tr = (c: Creature): Trait[] => [...c.g, c.b];
 export const tad = (c: Creature): boolean => c.sp === 'カエル' && c.age < 1;
@@ -25,8 +33,8 @@ export const dodge = (c: Creature): number =>
 export const yo = (c: Creature): number =>
   SP[c.sp].y + c.yb + tr(c).reduce((a, t) => a + t[2], 0);
 
-export const R = (a: number, b: number): number => a + Math.random() * (b - a);
-export const pick = <T>(a: T[]): T => a[Math.floor(Math.random() * a.length)];
+export const R = (a: number, b: number, rng: Rng = currentRng): number => a + rng() * (b - a);
+export const pick = <T>(a: T[], rng: Rng = currentRng): T => a[Math.floor(rng() * a.length)];
 export const sl = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms));
 export const E = (s: any): string =>
   String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] || c));

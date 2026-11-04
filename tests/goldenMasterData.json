@@ -1,0 +1,1149 @@
+[
+  {
+    "halfIdx": 0,
+    "plan": {
+      "2": "wish",
+      "5": "sign",
+      "7": "wx"
+    },
+    "sceneEvents": [
+      {
+        "week": 2,
+        "sceneId": "wish",
+        "result": "wish_stay:あずき"
+      },
+      {
+        "week": 5,
+        "sceneId": "sign",
+        "result": "caught:あずき"
+      },
+      {
+        "week": 7,
+        "sceneId": "wx",
+        "result": "wx:rain_adjusted"
+      }
+    ],
+    "metamorphosed": [
+      "くり"
+    ],
+    "harvest": null,
+    "creatures": [
+      {
+        "id": 2,
+        "n": "くり",
+        "sp": "カエル",
+        "age": 1,
+        "yrs": 0,
+        "lv": 1,
+        "yb": 0,
+        "db": 0,
+        "dodge": 73
+      }
+    ]
+  },
+  {
+    "halfIdx": 1,
+    "plan": {
+      "9": "sign",
+      "11": "meet"
+    },
+    "sceneEvents": [
+      {
+        "week": 9,
+        "sceneId": "sign",
+        "result": "dodged:くり"
+      },
+      {
+        "week": 11,
+        "sceneId": "meet",
+        "result": "joined:カエル"
+      }
+    ],
+    "metamorphosed": [
+      "たろう"
+    ],
+    "harvest": {
+      "r": 74,
+      "a": 48,
+      "b": 3,
+      "c": 5,
+      "money": 740
+    },
+    "creatures": [
+      {
+        "id": 2,
+        "n": "くり",
+        "sp": "カエル",
+        "age": 2,
+        "yrs": 1,
+        "lv": 3,
+        "yb": 0,
+        "db": 6,
+        "dodge": 71
+      },
+      {
+        "id": 3,
+        "n": "たろう",
+        "sp": "カエル",
+        "age": 1,
+        "yrs": 1,
+        "lv": 1,
+        "yb": 0,
+        "db": 3,
+        "dodge": 48
+      }
+    ]
+  },
+  {
+    "halfIdx": 2,
+    "plan": {
+      "2": "meet",
+      "5": "sign",
+      "7": "wish"
+    },
+    "sceneEvents": [
+      {
+        "week": 2,
+        "sceneId": "meet",
+        "result": "joined:ドジョウ"
+      },
+      {
+        "week": 5,
+        "sceneId": "sign",
+        "result": "caught:たろう"
+      },
+      {
+        "week": 7,
+        "sceneId": "wish",
+        "result": "wish_stay:くり"
+      }
+    ],
+    "metamorphosed": [],
+    "harvest": null,
+    "creatures": [
+      {
+        "id": 2,
+        "n": "くり",
+        "sp": "カエル",
+        "age": 3,
+        "yrs": 1,
+        "lv": 6,
+        "yb": 0,
+        "db": 6,
+        "dodge": 79
+      },
+      {
+        "id": 4,
+        "n": "もち",
+        "sp": "ドジョウ",
+        "age": 1,
+        "yrs": 0,
+        "lv": 1,
+        "yb": 0,
+        "db": 0,
+        "dodge": 82
+      }
+    ]
+  },
+  {
+    "halfIdx": 3,
+    "plan": {
+      "9": "sign",
+      "11": "meet"
+    },
+    "sceneEvents": [
+      {
+        "week": 9,
+        "sceneId": "sign",
+        "result": "dodged:くり"
+      },
+      {
+        "week": 11,
+        "sceneId": "meet",
+        "result": "joined:カエル"
+      }
+    ],
+    "metamorphosed": [
+      "みどり"
+    ],
+    "harvest": {
+      "r": 92,
+      "a": 48,
+      "b": 4,
+      "c": 10,
+      "money": 1660
+    },
+    "creatures": [
+      {
+        "id": 2,
+        "n": "くり",
+        "sp": "カエル",
+        "age": 4,
+        "yrs": 2,
+        "lv": 8,
+        "yb": 0,
+        "db": 12,
+        "dodge": 77
+      },
+      {
+        "id": 4,
+        "n": "もち",
+        "sp": "ドジョウ",
+        "age": 2,
+        "yrs": 1,
+        "lv": 2,
+        "yb": 0,
+        "db": 3,
+        "dodge": 77
+      },
+      {
+        "id": 5,
+        "n": "みどり",
+        "sp": "カエル",
+        "age": 1,
+        "yrs": 1,
+        "lv": 1,
+        "yb": 0,
+        "db": 3,
+        "dodge": 68
+      }
+    ]
+  },
+  {
+    "halfIdx": 4,
+    "plan": {
+      "2": "wish",
+      "5": "sign",
+      "7": "wx"
+    },
+    "sceneEvents": [
+      {
+        "week": 2,
+        "sceneId": "wish",
+        "result": "wish_stay:くり"
+      },
+      {
+        "week": 5,
+        "sceneId": "sign",
+        "result": "dodged:くり"
+      },
+      {
+        "week": 7,
+        "sceneId": "wx",
+        "result": "wx:rain_adjusted"
+      }
+    ],
+    "metamorphosed": [],
+    "harvest": null,
+    "creatures": [
+      {
+        "id": 2,
+        "n": "くり",
+        "sp": "カエル",
+        "age": 5,
+        "yrs": 2,
+        "lv": 9,
+        "yb": 0,
+        "db": 15,
+        "dodge": 88
+      },
+      {
+        "id": 4,
+        "n": "もち",
+        "sp": "ドジョウ",
+        "age": 3,
+        "yrs": 1,
+        "lv": 3,
+        "yb": 0,
+        "db": 3,
+        "dodge": 85
+      },
+      {
+        "id": 5,
+        "n": "みどり",
+        "sp": "カエル",
+        "age": 2,
+        "yrs": 1,
+        "lv": 2,
+        "yb": 0,
+        "db": 3,
+        "dodge": 76
+      }
+    ]
+  },
+  {
+    "halfIdx": 5,
+    "plan": {
+      "9": "sign",
+      "11": "wx"
+    },
+    "sceneEvents": [
+      {
+        "week": 9,
+        "sceneId": "sign",
+        "result": "caught:みどり"
+      },
+      {
+        "week": 11,
+        "sceneId": "wx",
+        "result": "wx:drought_adjusted"
+      }
+    ],
+    "metamorphosed": [],
+    "harvest": {
+      "r": 72,
+      "a": 24,
+      "b": 5,
+      "c": 10,
+      "money": 2380
+    },
+    "creatures": [
+      {
+        "id": 2,
+        "n": "くり",
+        "sp": "カエル",
+        "age": 6,
+        "yrs": 3,
+        "lv": 9,
+        "yb": 1,
+        "db": 15,
+        "dodge": 80
+      },
+      {
+        "id": 4,
+        "n": "もち",
+        "sp": "ドジョウ",
+        "age": 4,
+        "yrs": 2,
+        "lv": 4,
+        "yb": 1,
+        "db": 3,
+        "dodge": 77
+      }
+    ]
+  },
+  {
+    "halfIdx": 6,
+    "plan": {
+      "2": "meet",
+      "5": "sign",
+      "7": "wish"
+    },
+    "sceneEvents": [
+      {
+        "week": 2,
+        "sceneId": "meet",
+        "result": "joined:メダカ"
+      },
+      {
+        "week": 5,
+        "sceneId": "sign",
+        "result": "caught:そら"
+      },
+      {
+        "week": 7,
+        "sceneId": "wish",
+        "result": "wish_stay:くり"
+      }
+    ],
+    "metamorphosed": [],
+    "harvest": null,
+    "creatures": [
+      {
+        "id": 2,
+        "n": "くり",
+        "sp": "カエル",
+        "age": 7,
+        "yrs": 3,
+        "lv": 9,
+        "yb": 1,
+        "db": 15,
+        "dodge": 88
+      },
+      {
+        "id": 4,
+        "n": "もち",
+        "sp": "ドジョウ",
+        "age": 5,
+        "yrs": 2,
+        "lv": 5,
+        "yb": 1,
+        "db": 3,
+        "dodge": 85
+      }
+    ]
+  },
+  {
+    "halfIdx": 7,
+    "plan": {
+      "9": "sign",
+      "11": "wx"
+    },
+    "sceneEvents": [
+      {
+        "week": 9,
+        "sceneId": "sign",
+        "result": "dodged:もち"
+      },
+      {
+        "week": 11,
+        "sceneId": "wx",
+        "result": "wx:rain_adjusted"
+      }
+    ],
+    "metamorphosed": [],
+    "harvest": {
+      "r": 78,
+      "a": 30,
+      "b": 5,
+      "c": 10,
+      "money": 3160
+    },
+    "creatures": [
+      {
+        "id": 2,
+        "n": "くり",
+        "sp": "カエル",
+        "age": 8,
+        "yrs": 4,
+        "lv": 9,
+        "yb": 1,
+        "db": 18,
+        "dodge": 83
+      },
+      {
+        "id": 4,
+        "n": "もち",
+        "sp": "ドジョウ",
+        "age": 6,
+        "yrs": 3,
+        "lv": 7,
+        "yb": 1,
+        "db": 9,
+        "dodge": 83
+      }
+    ]
+  },
+  {
+    "halfIdx": 8,
+    "plan": {
+      "2": "wx",
+      "5": "sign",
+      "7": "wish"
+    },
+    "sceneEvents": [
+      {
+        "week": 2,
+        "sceneId": "wx",
+        "result": "wx:drought_adjusted"
+      },
+      {
+        "week": 5,
+        "sceneId": "sign",
+        "result": "dodged:もち"
+      },
+      {
+        "week": 7,
+        "sceneId": "wish",
+        "result": "wish_stay:もち"
+      }
+    ],
+    "metamorphosed": [],
+    "harvest": null,
+    "creatures": [
+      {
+        "id": 2,
+        "n": "くり",
+        "sp": "カエル",
+        "age": 9,
+        "yrs": 4,
+        "lv": 9,
+        "yb": 1,
+        "db": 18,
+        "dodge": 91
+      },
+      {
+        "id": 4,
+        "n": "もち",
+        "sp": "ドジョウ",
+        "age": 7,
+        "yrs": 3,
+        "lv": 9,
+        "yb": 1,
+        "db": 12,
+        "dodge": 94
+      }
+    ]
+  },
+  {
+    "halfIdx": 9,
+    "plan": {
+      "9": "sign",
+      "11": "meet"
+    },
+    "sceneEvents": [
+      {
+        "week": 9,
+        "sceneId": "sign",
+        "result": "dodged:もち"
+      },
+      {
+        "week": 11,
+        "sceneId": "meet",
+        "result": "joined:ドジョウ"
+      }
+    ],
+    "metamorphosed": [],
+    "harvest": {
+      "r": 80,
+      "a": 48,
+      "b": 2,
+      "c": 10,
+      "money": 4260
+    },
+    "creatures": [
+      {
+        "id": 2,
+        "n": "くり",
+        "sp": "カエル",
+        "age": 10,
+        "yrs": 5,
+        "lv": 9,
+        "yb": 1,
+        "db": 21,
+        "dodge": 86
+      },
+      {
+        "id": 4,
+        "n": "もち",
+        "sp": "ドジョウ",
+        "age": 8,
+        "yrs": 4,
+        "lv": 9,
+        "yb": 1,
+        "db": 18,
+        "dodge": 92
+      },
+      {
+        "id": 7,
+        "n": "ぽん",
+        "sp": "ドジョウ",
+        "age": 1,
+        "yrs": 1,
+        "lv": 1,
+        "yb": 0,
+        "db": 3,
+        "dodge": 77
+      }
+    ]
+  },
+  {
+    "halfIdx": 10,
+    "plan": {
+      "2": "wx",
+      "5": "sign",
+      "7": "wish"
+    },
+    "sceneEvents": [
+      {
+        "week": 2,
+        "sceneId": "wx",
+        "result": "wx:rain_adjusted"
+      },
+      {
+        "week": 5,
+        "sceneId": "sign",
+        "result": "dodged:くり"
+      },
+      {
+        "week": 7,
+        "sceneId": "wish",
+        "result": "wish_stay:ぽん"
+      }
+    ],
+    "metamorphosed": [],
+    "harvest": null,
+    "creatures": [
+      {
+        "id": 2,
+        "n": "くり",
+        "sp": "カエル",
+        "age": 11,
+        "yrs": 5,
+        "lv": 9,
+        "yb": 1,
+        "db": 24,
+        "dodge": 95
+      },
+      {
+        "id": 4,
+        "n": "もち",
+        "sp": "ドジョウ",
+        "age": 9,
+        "yrs": 4,
+        "lv": 9,
+        "yb": 1,
+        "db": 18,
+        "dodge": 95
+      },
+      {
+        "id": 7,
+        "n": "ぽん",
+        "sp": "ドジョウ",
+        "age": 2,
+        "yrs": 1,
+        "lv": 4,
+        "yb": 0,
+        "db": 3,
+        "dodge": 85
+      }
+    ]
+  },
+  {
+    "halfIdx": 11,
+    "plan": {
+      "9": "sign",
+      "11": "wish"
+    },
+    "sceneEvents": [
+      {
+        "week": 9,
+        "sceneId": "sign",
+        "result": "dodged:ぽん"
+      },
+      {
+        "week": 11,
+        "sceneId": "wish",
+        "result": "wish_stay:ぽん"
+      }
+    ],
+    "metamorphosed": [],
+    "harvest": {
+      "r": 91,
+      "a": 48,
+      "b": 1,
+      "c": 10,
+      "money": 5470
+    },
+    "creatures": [
+      {
+        "id": 2,
+        "n": "くり",
+        "sp": "カエル",
+        "age": 12,
+        "yrs": 6,
+        "lv": 9,
+        "yb": 2,
+        "db": 24,
+        "dodge": 89
+      },
+      {
+        "id": 4,
+        "n": "もち",
+        "sp": "ドジョウ",
+        "age": 10,
+        "yrs": 5,
+        "lv": 9,
+        "yb": 2,
+        "db": 18,
+        "dodge": 92
+      },
+      {
+        "id": 7,
+        "n": "ぽん",
+        "sp": "ドジョウ",
+        "age": 3,
+        "yrs": 2,
+        "lv": 8,
+        "yb": 1,
+        "db": 6,
+        "dodge": 80
+      }
+    ]
+  },
+  {
+    "halfIdx": 12,
+    "plan": {
+      "2": "wish",
+      "5": "sign",
+      "7": "wx"
+    },
+    "sceneEvents": [
+      {
+        "week": 2,
+        "sceneId": "wish",
+        "result": "wish_stay:もち"
+      },
+      {
+        "week": 5,
+        "sceneId": "sign",
+        "result": "dodged:くり"
+      },
+      {
+        "week": 7,
+        "sceneId": "wx",
+        "result": "wx:drought_adjusted"
+      }
+    ],
+    "metamorphosed": [],
+    "harvest": null,
+    "creatures": [
+      {
+        "id": 2,
+        "n": "くり",
+        "sp": "カエル",
+        "age": 13,
+        "yrs": 6,
+        "lv": 9,
+        "yb": 2,
+        "db": 27,
+        "dodge": 95
+      },
+      {
+        "id": 4,
+        "n": "もち",
+        "sp": "ドジョウ",
+        "age": 11,
+        "yrs": 5,
+        "lv": 9,
+        "yb": 2,
+        "db": 18,
+        "dodge": 95
+      },
+      {
+        "id": 7,
+        "n": "ぽん",
+        "sp": "ドジョウ",
+        "age": 4,
+        "yrs": 2,
+        "lv": 9,
+        "yb": 1,
+        "db": 6,
+        "dodge": 88
+      }
+    ]
+  },
+  {
+    "halfIdx": 13,
+    "plan": {
+      "9": "sign",
+      "11": "wish"
+    },
+    "sceneEvents": [
+      {
+        "week": 9,
+        "sceneId": "sign",
+        "result": "dodged:もち"
+      },
+      {
+        "week": 11,
+        "sceneId": "wish",
+        "result": "wish_stay:くり"
+      }
+    ],
+    "metamorphosed": [],
+    "harvest": {
+      "r": 100,
+      "a": 57,
+      "b": 0,
+      "c": 10,
+      "money": 6770
+    },
+    "creatures": [
+      {
+        "id": 2,
+        "n": "くり",
+        "sp": "カエル",
+        "age": 14,
+        "yrs": 7,
+        "lv": 9,
+        "yb": 3,
+        "db": 27,
+        "dodge": 92
+      },
+      {
+        "id": 4,
+        "n": "もち",
+        "sp": "ドジョウ",
+        "age": 12,
+        "yrs": 6,
+        "lv": 9,
+        "yb": 3,
+        "db": 21,
+        "dodge": 95
+      },
+      {
+        "id": 7,
+        "n": "ぽん",
+        "sp": "ドジョウ",
+        "age": 5,
+        "yrs": 3,
+        "lv": 9,
+        "yb": 2,
+        "db": 6,
+        "dodge": 80
+      }
+    ]
+  },
+  {
+    "halfIdx": 14,
+    "plan": {
+      "2": "wish",
+      "5": "sign",
+      "7": "wx"
+    },
+    "sceneEvents": [
+      {
+        "week": 2,
+        "sceneId": "wish",
+        "result": "wish_stay:くり"
+      },
+      {
+        "week": 5,
+        "sceneId": "sign",
+        "result": "dodged:ぽん"
+      },
+      {
+        "week": 7,
+        "sceneId": "wx",
+        "result": "wx:drought_adjusted"
+      }
+    ],
+    "metamorphosed": [],
+    "harvest": null,
+    "creatures": [
+      {
+        "id": 2,
+        "n": "くり",
+        "sp": "カエル",
+        "age": 15,
+        "yrs": 7,
+        "lv": 9,
+        "yb": 3,
+        "db": 27,
+        "dodge": 95
+      },
+      {
+        "id": 4,
+        "n": "もち",
+        "sp": "ドジョウ",
+        "age": 13,
+        "yrs": 6,
+        "lv": 9,
+        "yb": 3,
+        "db": 21,
+        "dodge": 95
+      },
+      {
+        "id": 7,
+        "n": "ぽん",
+        "sp": "ドジョウ",
+        "age": 6,
+        "yrs": 3,
+        "lv": 9,
+        "yb": 2,
+        "db": 9,
+        "dodge": 91
+      }
+    ]
+  },
+  {
+    "halfIdx": 15,
+    "plan": {
+      "9": "sign",
+      "11": "wx"
+    },
+    "sceneEvents": [
+      {
+        "week": 9,
+        "sceneId": "sign",
+        "result": "dodged:もち"
+      },
+      {
+        "week": 11,
+        "sceneId": "wx",
+        "result": "wx:rain_adjusted"
+      }
+    ],
+    "metamorphosed": [],
+    "harvest": {
+      "r": 103,
+      "a": 66,
+      "b": 0,
+      "c": 10,
+      "money": 8100
+    },
+    "creatures": [
+      {
+        "id": 2,
+        "n": "くり",
+        "sp": "カエル",
+        "age": 16,
+        "yrs": 8,
+        "lv": 9,
+        "yb": 4,
+        "db": 27,
+        "dodge": 92
+      },
+      {
+        "id": 4,
+        "n": "もち",
+        "sp": "ドジョウ",
+        "age": 14,
+        "yrs": 7,
+        "lv": 9,
+        "yb": 4,
+        "db": 24,
+        "dodge": 95
+      },
+      {
+        "id": 7,
+        "n": "ぽん",
+        "sp": "ドジョウ",
+        "age": 7,
+        "yrs": 4,
+        "lv": 9,
+        "yb": 3,
+        "db": 9,
+        "dodge": 83
+      }
+    ]
+  },
+  {
+    "halfIdx": 16,
+    "plan": {
+      "2": "wx",
+      "5": "sign",
+      "7": "wish"
+    },
+    "sceneEvents": [
+      {
+        "week": 2,
+        "sceneId": "wx",
+        "result": "wx:drought_adjusted"
+      },
+      {
+        "week": 5,
+        "sceneId": "sign",
+        "result": "dodged:くり"
+      },
+      {
+        "week": 7,
+        "sceneId": "wish",
+        "result": "wish_stay:ぽん"
+      }
+    ],
+    "metamorphosed": [],
+    "harvest": null,
+    "creatures": [
+      {
+        "id": 2,
+        "n": "くり",
+        "sp": "カエル",
+        "age": 17,
+        "yrs": 8,
+        "lv": 9,
+        "yb": 4,
+        "db": 30,
+        "dodge": 95
+      },
+      {
+        "id": 4,
+        "n": "もち",
+        "sp": "ドジョウ",
+        "age": 15,
+        "yrs": 7,
+        "lv": 9,
+        "yb": 4,
+        "db": 24,
+        "dodge": 95
+      },
+      {
+        "id": 7,
+        "n": "ぽん",
+        "sp": "ドジョウ",
+        "age": 8,
+        "yrs": 4,
+        "lv": 9,
+        "yb": 3,
+        "db": 9,
+        "dodge": 91
+      }
+    ]
+  },
+  {
+    "halfIdx": 17,
+    "plan": {
+      "9": "sign",
+      "11": "wx"
+    },
+    "sceneEvents": [
+      {
+        "week": 9,
+        "sceneId": "sign",
+        "result": "dodged:くり"
+      },
+      {
+        "week": 11,
+        "sceneId": "wx",
+        "result": "wx:drought_adjusted"
+      }
+    ],
+    "metamorphosed": [],
+    "harvest": {
+      "r": 110,
+      "a": 75,
+      "b": 0,
+      "c": 10,
+      "money": 9500
+    },
+    "creatures": [
+      {
+        "id": 2,
+        "n": "くり",
+        "sp": "カエル",
+        "age": 18,
+        "yrs": 9,
+        "lv": 9,
+        "yb": 5,
+        "db": 33,
+        "dodge": 95
+      },
+      {
+        "id": 4,
+        "n": "もち",
+        "sp": "ドジョウ",
+        "age": 16,
+        "yrs": 8,
+        "lv": 9,
+        "yb": 5,
+        "db": 24,
+        "dodge": 95
+      },
+      {
+        "id": 7,
+        "n": "ぽん",
+        "sp": "ドジョウ",
+        "age": 9,
+        "yrs": 5,
+        "lv": 9,
+        "yb": 4,
+        "db": 9,
+        "dodge": 83
+      }
+    ]
+  },
+  {
+    "halfIdx": 18,
+    "plan": {
+      "2": "wish",
+      "5": "sign",
+      "7": "wx"
+    },
+    "sceneEvents": [
+      {
+        "week": 2,
+        "sceneId": "wish",
+        "result": "wish_stay:ぽん"
+      },
+      {
+        "week": 5,
+        "sceneId": "sign",
+        "result": "caught:もち"
+      },
+      {
+        "week": 7,
+        "sceneId": "wx",
+        "result": "wx:drought_adjusted"
+      }
+    ],
+    "metamorphosed": [],
+    "harvest": null,
+    "creatures": [
+      {
+        "id": 2,
+        "n": "くり",
+        "sp": "カエル",
+        "age": 19,
+        "yrs": 9,
+        "lv": 9,
+        "yb": 5,
+        "db": 33,
+        "dodge": 95
+      },
+      {
+        "id": 7,
+        "n": "ぽん",
+        "sp": "ドジョウ",
+        "age": 10,
+        "yrs": 5,
+        "lv": 9,
+        "yb": 4,
+        "db": 9,
+        "dodge": 91
+      }
+    ]
+  },
+  {
+    "halfIdx": 19,
+    "plan": {
+      "9": "sign",
+      "11": "meet"
+    },
+    "sceneEvents": [
+      {
+        "week": 9,
+        "sceneId": "sign",
+        "result": "dodged:くり"
+      },
+      {
+        "week": 11,
+        "sceneId": "meet",
+        "result": "joined:ドジョウ"
+      }
+    ],
+    "metamorphosed": [],
+    "harvest": {
+      "r": 125,
+      "a": 75,
+      "b": 7,
+      "c": 10,
+      "money": 10750
+    },
+    "creatures": [
+      {
+        "id": 2,
+        "n": "くり",
+        "sp": "カエル",
+        "age": 20,
+        "yrs": 10,
+        "lv": 9,
+        "yb": 5,
+        "db": 39,
+        "dodge": 95
+      },
+      {
+        "id": 7,
+        "n": "ぽん",
+        "sp": "ドジョウ",
+        "age": 11,
+        "yrs": 6,
+        "lv": 9,
+        "yb": 4,
+        "db": 12,
+        "dodge": 86
+      },
+      {
+        "id": 8,
+        "n": "そら",
+        "sp": "ドジョウ",
+        "age": 1,
+        "yrs": 1,
+        "lv": 1,
+        "yb": 0,
+        "db": 3,
+        "dodge": 77
+      }
+    ]
+  }
+]

@@ -1,6 +1,6 @@
-import { Creature, CreatureMove } from '../types';
+import { Creature, CreatureMove, Rng } from '../types';
 import { S, log } from '../game/state';
-import { dodge, surf, tad, R, sl, E } from '../game/calc';
+import { dodge, surf, tad, R, sl, E, random } from '../game/calc';
 import { SKY } from '../data/sky';
 import { toast, ask } from './ui';
 
@@ -263,8 +263,8 @@ export async function heron(c: Creature, caught: boolean): Promise<void> {
   h.style.display = 'none';
 }
 
-export async function strike(c: Creature, addVal: number, w?: number): Promise<void> {
-  const caught = Math.random() * 100 > dodge(c) + addVal;
+export async function strike(c: Creature, addVal: number, w?: number, rng: Rng = random): Promise<void> {
+  const caught = rng() * 100 > dodge(c) + addVal;
   await heron(c, caught);
   if (caught) {
     S.cr = S.cr.filter((x) => x !== c);

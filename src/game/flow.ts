@@ -3,6 +3,7 @@ import { yo, R, sl, E } from './calc';
 import { paint, party, RM, art } from '../view/scene';
 import { ui, sheet, winterH, ask, toast } from '../view/ui';
 import { plan, play, goalScene } from './scenes';
+import { checkEvolution } from '../data/evolution';
 
 export async function half(): Promise<void> {
   if (busy || S.phase !== 'play') return;
@@ -31,7 +32,16 @@ export async function half(): Promise<void> {
     c.lv = Math.min(9, c.lv + 1);
   });
 
-  const fr = S.cr.filter((c) => c.sp === 'カエル' && c.age === 1);
+  // 進化ルール（変身）の適用チェック
+  const transformedCreatures: typeof S.cr = [];
+  for (const c of S.cr) {
+    const evo = checkEvolution(c, '変身', S);
+    if (evo) {
+      if (evo.to) c.sp = evo.to;
+      if (evo.apply) evo.apply(c, S);
+      transformedCreatures.push(c);
+    }
+  }
 
   if (h) {
     harvest();
@@ -47,7 +57,7 @@ export async function half(): Promise<void> {
   paint();
   save();
 
-  for (const c of fr) {
+  for (const c of transformedCreatures) {
     party();
     await ask(
       '<h2>' +
@@ -92,10 +102,18 @@ export function harvest(): void {
 export function spring(): void {
   setPREV(JSON.stringify(S));
   const tend = S.tc >= S.wc;
+
+  // 年次進化（成長）ルールの適用
   S.cr.forEach((c) => {
     c.yrs++;
-    tend ? c.yb++ : (c.db += 3);
+    const evo = checkEvolution(c, '年明け', S);
+    if (evo && evo.apply) {
+      evo.apply(c, S);
+    } else {
+      tend ? c.yb++ : (c.db += 3);
+    }
   });
+
   if (S.cr.length)
     log(
       tend

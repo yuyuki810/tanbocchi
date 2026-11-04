@@ -1,6 +1,6 @@
 import './style.css';
 import { SP } from './data/species';
-import { SHOP } from './data/shop';
+import { buyUnlockItem } from './data/shop';
 import { cap } from './game/calc';
 import { S, PREV, busy, rsf, setS, setPREV, setRsf, save, log, fresh, initState } from './game/state';
 import { paint, loop, G, MV, ripple } from './view/scene';
@@ -41,21 +41,14 @@ document.addEventListener('click', (e) => {
   }
 
   if (d.b) {
-    if (d.b === 'field') {
-      const p = 600 + 300 * (S.own.field || 0);
-      if (S.money >= p && (S.own.field || 0) < 3) {
-        S.money -= p;
-        S.own.field = (S.own.field || 0) + 1;
+    const result = buyUnlockItem(d.b, S);
+    if (result.success && result.item) {
+      if (result.item.k === 'field') {
         log('田んぼを広げた。');
         toast('田んぼが広がった。上限' + cap() + '匹');
-      }
-    } else {
-      const i = SHOP.find((x) => x.k === d.b);
-      if (i && S.money >= i.p && !S.own[i.k]) {
-        S.money -= i.p;
-        S.own[i.k] = 1;
-        log(i.n + 'を解放した。');
-        toast(i.n + 'を解放した');
+      } else {
+        log(result.item.n + 'を解放した。');
+        toast(result.item.n + 'を解放した');
       }
     }
     save();

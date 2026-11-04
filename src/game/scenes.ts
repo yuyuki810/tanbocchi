@@ -1,181 +1,93 @@
-import { Scene, SpeciesName, GoalType } from '../types';
-import { S, add, log } from './state';
-import { cap, pick, sl, E } from './calc';
-import { SP } from '../data/species';
-import { strike, party, paint } from '../view/scene';
-import { choose, toast, ask, closeSheet } from '../view/ui';
+import { Scene, GoalType, Rng, SceneDef } from '../types';
+import { S } from './state';
+import { cap, random, sl } from './calc';
+import { SCENE_DEFS } from '../data/scenes';
+import { choose, toast, closeSheet } from '../view/ui';
 
-export const SC = {
-  sign(): Scene | undefined {
-    const c = pick(S.cr);
-    if (!c) return;
-    return {
-      t: 'サギの気配',
-      x: '水辺に白い影。' + c.n + 'の近くをねらっているようだ。',
-      c,
-      o: [
-        { l: '網を張る', h: '安全', k: 't', dis: !S.own.net, run: () => strike(c, 30) },
-        { l: '隠れ場所へ誘う', h: 'やや安全', k: 't', run: () => strike(c, 15) },
-        { l: '見守る', h: '賭け・守れたら成長', k: 'w', run: () => strike(c, 0, 1) },
-      ],
-    };
-  },
-  meet(): Scene | undefined {
-    if (S.cr.length >= cap()) return;
-    const rare = S.wc > S.tc;
-    return {
-      t: '出会い',
-      x:
-        '見知らぬ' +
-        (rare ? '珍しい' : '') +
-        '卵が流れ着いた。迎えますか?(いま' +
-        S.cr.length +
-        '/' +
-        cap() +
-        '匹)',
-      o: [
-        {
-          l: '迎える',
-          h: '仲間が増える',
-          k: 'w',
-          run: async () => {
-            const ks = Object.keys(SP) as SpeciesName[];
-            const sp = pick(ks.filter((s) => !S.dex.includes(s)).concat(ks));
-            add(sp, rare);
-            const n = S.cr[S.cr.length - 1];
-            const nw = !S.dex.includes(sp);
-            if (nw) S.dex.push(sp);
-            log(n.n + '(' + sp + ')が仲間になった。');
-            party();
-            toast(n.n + 'が仲間になった!' + (nw ? '図鑑に' + sp + 'が加わった' : ''));
-            await sl(1800);
-          },
-        },
-        {
-          l: 'そっとしておく',
-          h: 'いまの仲間に集中',
-          k: 't',
-          run: async () => {
-            toast('そっと見送った');
-            await sl(900);
-          },
-        },
-      ],
-    };
-  },
-  wx(): Scene {
-    const d = Math.random() < 0.5;
-    return {
-      t: d ? '日照り' : '大雨',
-      x: d ? '水が減り、稲の根が乾いてきた。' : '雨が続き、水があふれそうだ。',
-      o: [
-        {
-          l: '水位を調整する',
-          h: '安全',
-          k: 't',
-          run: async () => {
-            toast('水位を整えた。稲は無事');
-            await sl(1200);
-          },
-        },
-        {
-          l: '自然に任せる',
-          h: '賭け・恵みか不作か',
-          k: 'w',
-          run: async () => {
-            if (Math.random() < 0.55) {
-              S.nut += 8;
-              toast('恵みの' + (d ? '水' : '雨') + '。養分+8');
-            } else {
-              S.hm -= 0.08;
-              S.water = d ? 0 : 2;
-              toast('稲に負担がかかった。収穫-8%');
-            }
-            paint();
-            await sl(1700);
-          },
-        },
-      ],
-    };
-  },
-  wish(): Scene | undefined {
-    const c = pick(S.cr);
-    if (!c) return;
-    return {
-      t: c.n + 'の願い',
-      x: c.n + 'が、遠くへ行きたそうに水面を見ている。',
-      c,
-      o: [
-        {
-          l: '送り出す',
-          h: '賭け・帰らないかも',
-          k: 'w',
-          run: async () => {
-            if (Math.random() < 0.65) {
-              c.db += 3;
-              c.lv = Math.min(9, c.lv + 1);
-              S.money += 120;
-              log(c.n + 'が宝物を持って帰ってきた。');
-              party();
-              toast(c.n + 'が帰ってきた!宝物+120円・回避力アップ');
-              await sl(1900);
-            } else {
-              S.cr = S.cr.filter((x) => x !== c);
-              log(c.n + 'は旅立ったまま帰らなかった。');
-              paint();
-              await ask(
-                '<h2>' +
-                  E(c.n) +
-                  'は旅立った</h2><p>遠くへ行ったまま、帰ってこなかった。</p><p class="mu">いつか、どこかの田んぼで会えるかもしれない。</p><button class="go" data-a="close">見送る</button>'
-              );
-            }
-          },
-        },
-        {
-          l: '一緒にいる',
-          h: '安全・なつき度+2',
-          k: 't',
-          run: async () => {
-            c.lv = Math.min(9, c.lv + 2);
-            toast(c.n + 'はうれしそう。なつき度+2');
-            await sl(1400);
-          },
-        },
-        {
-          l: '止める',
-          h: '安全・収穫力+1',
-          k: 't',
-          run: async () => {
-            c.yb += 1;
-            toast(c.n + 'は稲のそばで落ち着いた。収穫力+1');
-            await sl(1400);
-          },
-        },
-      ],
-    };
-  },
-};
+export { SCENE_DEFS };
 
-export async function play(id: string): Promise<void> {
-  const scFunc = SC[id as keyof typeof SC];
-  if (!scFunc) return;
-  const sc = scFunc();
-  if (!sc) return;
-  const i = await choose(sc);
-  const o = sc.o[i];
-  o.k === 't' ? S.tc++ : S.wc++;
+/**
+ * 場面を実行する共通処理。
+ * choices: [] の「眺める出来事」にも対応。
+ */
+export async function executeScene(
+  def: SceneDef,
+  rng: Rng = random
+): Promise<void> {
+  const target = def.selectTarget ? def.selectTarget(S, rng) : undefined;
+  if (def.selectTarget && !target && def.when(S)) {
+    return;
+  }
+
+  // 天候（wx）場面用の事前フラグ設定（既存互換）
+  if (def.id === 'wx') {
+    (S as any)._wxIsDrought = rng() < 0.5;
+  }
+
+  const title = typeof def.title === 'function' ? def.title(S, target) : def.title;
+  const description =
+    typeof def.description === 'function' ? def.description(S, target) : def.description;
+
+  // 選択肢が空の場合: 眺める出来事（自動適用）
+  if (!def.choices || def.choices.length === 0) {
+    if (def.onWatch) {
+      await def.onWatch(S, rng);
+    }
+    return;
+  }
+
+  const sc: Scene = {
+    t: title,
+    x: description,
+    c: target,
+    o: def.choices.map((ch) => ({
+      l: ch.label,
+      h: ch.preview ?? '',
+      k: ch.kind === 'care' ? 't' : 'w',
+      dis: ch.disabled ? ch.disabled(S) : false,
+      run: async () => {
+        const result = ch.resolve(S, rng, target);
+        if (result instanceof Promise) {
+          await result;
+        } else if (result && typeof result === 'object' && 'effect' in result && result.effect) {
+          const eff = result.effect(S, rng);
+          if (eff instanceof Promise) await eff;
+        }
+      },
+    })),
+  };
+
+  const choiceIdx = await choose(sc);
+  const choice = def.choices[choiceIdx];
+  if (choice.kind === 'care') {
+    S.tc++;
+  } else {
+    S.wc++;
+  }
   closeSheet();
-  if (o.run) await o.run();
+
+  const opt = sc.o[choiceIdx];
+  if (opt.run) {
+    await opt.run();
+  }
 }
 
-export function plan(h: number): Record<number, string> {
+export async function play(id: string, rng: Rng = random): Promise<void> {
+  const def = SCENE_DEFS[id];
+  if (!def) return;
+  if (!def.when(S)) return;
+  await executeScene(def, rng);
+}
+
+export function plan(h: number, rng: Rng = random): Record<number, string> {
   const pos = h ? [9, 11] : [2, 5, 7];
   const n = pos.length;
   const pool = ['wx', 'wish'];
   if (S.cr.length < cap()) pool.push('meet');
   if (!h && S.goal === '増やす' && S.cr.length < cap()) pool.unshift('meet');
 
-  const rest = [...new Set(pool)].sort(() => Math.random() - 0.5);
+  // 未使用変数 ids は完全に削除済み
+  const rest = [...new Set(pool)].sort(() => rng() - 0.5);
   if (!h && S.goal === '増やす' && rest.includes('meet')) {
     rest.splice(rest.indexOf('meet'), 1);
     rest.unshift('meet');
