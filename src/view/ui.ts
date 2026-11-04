@@ -217,18 +217,22 @@ export function winterH(): string {
     S.money +
     '円)</h2>' +
     SHOP.map(
-      (i) =>
-        '<div class="shop"><div><b>' +
-        i.n +
-        '</b><br><span class="mu">' +
-        i.d +
-        '</span></div><button data-b="' +
-        i.k +
-        '" ' +
-        (S.own[i.k] || S.money < i.p ? 'disabled' : '') +
-        '>' +
-        (S.own[i.k] ? '解放済み' : i.p + '円') +
-        '</button></div>'
+      (i) => {
+        const cost = typeof i.p === 'function' ? i.p(S) : i.p;
+        return (
+          '<div class="shop"><div><b>' +
+          i.n +
+          '</b><br><span class="mu">' +
+          i.d +
+          '</span></div><button data-b="' +
+          i.k +
+          '" ' +
+          (S.own[i.k] || S.money < cost ? 'disabled' : '') +
+          '>' +
+          (S.own[i.k] ? '解放済み' : cost + '円') +
+          '</button></div>'
+        );
+      }
     ).join('') +
     '<div class="shop"><div><b>田んぼを広げる</b><br><span class="mu">飼える数が+1(いま上限' +
     cap() +
