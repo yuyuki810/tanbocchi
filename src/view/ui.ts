@@ -244,7 +244,7 @@ export function ui(): void {
       (isClockPaused ? '▶ 再開' : '⏸ 一時停止') +
       '</button>' +
       '<button class="speed-btn" data-a="toggle-speed">' +
-      (clockSpeed === 2 ? '×2' : '×1') +
+      (clockSpeed === 4 ? '×4' : clockSpeed === 2 ? '×2' : '×1') +
       '</button>' +
       '</div>';
   }

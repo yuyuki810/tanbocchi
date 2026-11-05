@@ -50,6 +50,20 @@ describe('clock (時計ロジック)', () => {
     expect(res.deltaSec).toBe(0);
   });
 
+  it('4倍速 (speed=4) では4倍速く進む', () => {
+    const clock: ClockState = {
+      elapsedSec: 0,
+      totalSec: 200,
+      paused: false,
+      speed: 4,
+      events: [],
+    };
+
+    const res = advanceClock(clock, 0, 100, customSeasonSec);
+    expect(clock.elapsedSec).toBeCloseTo(0.4, 5);
+    expect(res.deltaSec).toBeCloseTo(0.4, 5);
+  });
+
   it('倍速 (speed=2) では2倍速く進む', () => {
     const clock: ClockState = {
       elapsedSec: 0,

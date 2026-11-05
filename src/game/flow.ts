@@ -221,7 +221,7 @@ export function togglePause(): void {
  */
 export function toggleSpeed(): void {
   if (!S.clock) return;
-  S.clock.speed = S.clock.speed === 1 ? 2 : 1;
+  S.clock.speed = S.clock.speed === 1 ? 2 : S.clock.speed === 2 ? 4 : 1;
   ui();
 }
 
