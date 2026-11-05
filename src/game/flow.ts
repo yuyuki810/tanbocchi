@@ -6,72 +6,11 @@ import { plan, play, goalScene } from './scenes';
 import { checkEvolution } from '../data/evolution';
 
 export async function half(): Promise<void> {
-  if (busy || S.phase !== 'play') return;
-  setBusy(true);
-  setPREV(JSON.stringify(S));
-  ui();
-  const h = S.h;
-  const from = h ? 8 : 0;
-  const to = h ? 12 : 8;
-
-  if (!h && !S.goal) await goalScene();
-  const pl = plan(h);
-
-  for (let w = from; w < to; w++) {
-    S.w = w;
-    paint();
-    ui();
-    await sl(RM ? 100 : 480);
-    if (pl[w]) await play(pl[w]);
+  if (!S.clock || S.clock.events.length === 0 || S.clock.elapsedSec >= S.clock.totalSec) {
+    await startHalf();
+  } else if (S.clock.paused) {
+    togglePause();
   }
-
-  S.w = to;
-  S.water = 1;
-  S.cr.forEach((c) => {
-    c.age++;
-    c.lv = Math.min(9, c.lv + 1);
-  });
-
-  // 進化ルール（変身）の適用チェック
-  const transformedCreatures: typeof S.cr = [];
-  for (const c of S.cr) {
-    const evo = checkEvolution(c, '変身', S);
-    if (evo) {
-      if (evo.to) c.sp = evo.to;
-      if (evo.apply) evo.apply(c, S);
-      transformedCreatures.push(c);
-    }
-  }
-
-  if (h) {
-    harvest();
-    S.phase = 'winter';
-    paint();
-    save();
-    setBusy(false);
-    ui();
-    return sheet(winterH());
-  }
-
-  S.h = 1;
-  paint();
-  save();
-
-  for (const c of transformedCreatures) {
-    party();
-    await ask(
-      '<h2>' +
-        E(c.n) +
-        'が変身した!</h2><svg viewBox="-30 -18 60 36" style="width:140px;margin:0 auto">' +
-        art(c) +
-        '</svg><p>オタマジャクシから、立派なカエルになった。</p><button class="go" data-a="close">おめでとう</button>'
-    );
-  }
-
-  log('夏が終わった。稲が実りはじめた。');
-  toast('夏が終わった。稲が実りはじめた');
-  setBusy(false);
-  ui();
 }
 
 export function harvest(): void {
