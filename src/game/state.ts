@@ -1,11 +1,12 @@
-import { GameState, SpeciesName, Rng, ClockState } from '../types';
+import { GameState, SpeciesName, Rng } from '../types';
 import { GOOD, BAD, NM } from '../data/traits';
 import { pick, random } from './calc';
 import { SEASON_SECONDS } from '../data/timing';
 import { getHalfTotalSec } from './clock';
+import { setSoundEnabled } from '../audio/audio';
 
 export const SAVE_KEY = 'tanbocchi';
-export const CURRENT_SCHEMA_VERSION = 3;
+export const CURRENT_SCHEMA_VERSION = 4;
 export const SAVE_VERSION = CURRENT_SCHEMA_VERSION;
 
 export let S: GameState;
@@ -31,7 +32,7 @@ export function setRsf(val: boolean): void {
 
 /**
  * 新しいセーブ項目を足す手順:
- * 1. src/types.ts の GameState 型に新項目を追加する（オプショナル、または既定値を用意）
+ * 1. src/types.ts の GameState 型に新項目を追加する
  * 2. このファイルの migrations オブジェクトに移行関数を追加する
  * 3. CURRENT_SCHEMA_VERSION を 1 増やす
  * 4. tests/save.test.ts に移行テストを追加する
@@ -58,9 +59,20 @@ export const migrations: Record<number, MigrationFn> = {
       clock: v2.clock ?? {
         elapsedSec: 0,
         totalSec,
-        paused: true, // 読み込み時は一時停止から再開
+        paused: true,
         speed: 1,
         events: [],
+      },
+    };
+  },
+  // v3 -> v4 (ベータ4 フェーズ2B: 音設定)
+  3: (v3: any): any => {
+    return {
+      ...v3,
+      schemaVersion: 4,
+      ver: 4,
+      settings: v3.settings ?? {
+        sound: true,
       },
     };
   },
@@ -110,7 +122,11 @@ export function load(): GameState | null {
     const j = localStorage.getItem(SAVE_KEY);
     if (j) {
       const parsed = JSON.parse(j);
-      return migrate(parsed);
+      const s = migrate(parsed);
+      if (s) {
+        setSoundEnabled(s.settings?.sound ?? true);
+        return s;
+      }
     }
   } catch (e) {}
   return null;
@@ -175,7 +191,11 @@ export function fresh(): GameState {
       speed: 1,
       events: [],
     },
+    settings: {
+      sound: true,
+    },
   };
+  setSoundEnabled(true);
   add('メダカ');
   add('カエル');
   log('春になった。2つの命が生まれた。');

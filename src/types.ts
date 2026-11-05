@@ -78,13 +78,14 @@ export interface OwnItems {
   [key: string]: number | undefined;
 }
 
-// 時計・時間駆動用型（フェーズ2A追加）
+// 時計・時間駆動用型
 export type SeasonName = '春' | '夏' | '秋' | '冬';
 
 export interface ScheduledEvent {
-  id: string;         // 場面ID
+  id: string;         // 場面ID または 出来事ID
   ratio: number;      // 半期内の発生時刻の割合 (0〜1)
   triggered: boolean; // 発火済みか
+  isWatch?: boolean;  // 眺める出来事か (時間を止めない)
 }
 
 export interface ClockState {
@@ -92,8 +93,13 @@ export interface ClockState {
   totalSec: number;          // 現在の半期の合計秒
   paused: boolean;           // 一時停止中か
   speed: number;             // 倍速 (1 or 2)
-  events: ScheduledEvent[];  // 予定場面リスト
+  events: ScheduledEvent[];  // 予定場面・出来事リスト
   activeSceneId?: string;    // 場面実行中の場合の場面ID
+}
+
+// 設定 (フェーズ2B追加: 音設定)
+export interface SettingsState {
+  sound: boolean;
 }
 
 export interface GameState {
@@ -120,8 +126,9 @@ export interface GameState {
   phase: GamePhase;
   last: HarvestResult | null;
   seen: number;
-  clock?: ClockState; // フェーズ2Aで追加 (セーブv3)
-  [key: string]: any; // 未知の項目を保持
+  clock?: ClockState;
+  settings?: SettingsState; // フェーズ2Bで追加 (セーブv4)
+  [key: string]: any;       // 未知の項目を保持
 }
 
 export interface Option {
@@ -147,7 +154,7 @@ export interface CreatureMove {
   d: number;
 }
 
-// 場面定義の型（指示書 3.1 準拠）
+// 場面定義の型
 export type Season = '春夏' | '秋冬';
 
 export type Outcome = {
@@ -169,17 +176,27 @@ export interface SceneDef {
   id: string;
   title: string | ((s: GameState, target?: Creature) => string);
   description: string | ((s: GameState, target?: Creature) => string);
-  seasons: Season[];
+  seasons: Season[] | SeasonName[]; // 季節名での個別指定も許容
   when: (s: GameState) => boolean;
   weight: number | ((s: GameState) => number);
-  tags?: string[]; // 例: 'predator', 'weather', 'disease' (ベータ5用余地)
+  tags?: string[];
   selectTarget?: (s: GameState, rng: Rng) => Creature | undefined;
   choices: ChoiceDef[];
-  // 選択肢が空（choices: []）の眺める場面用のコールバック
   onWatch?: (s: GameState, rng: Rng) => Promise<void> | void;
+  sound?: string; // 任意の効果音キー
 }
 
-// 進化定義の型（指示書 3.3 準拠）
+// 眺める出来事の型 (フェーズ2B追加)
+export interface WatchEventDef {
+  id: string;
+  title: string;
+  text: string;
+  season: SeasonName;
+  apply: (s: GameState, rng: Rng) => void;
+  sound?: string;
+}
+
+// 進化定義の型
 export type EvoTiming = '変身' | '年明け';
 
 export type EvoCondition = (c: Creature, s: GameState) => boolean;

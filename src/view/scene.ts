@@ -31,6 +31,7 @@ export function art(c: Creature): string {
 }
 
 export function paint(): void {
+  if (typeof document === 'undefined') return;
   const s = Math.min(S.w >> 2, 3);
   const wi = S.w % 4;
   const A = [26, 80, 112, 124];

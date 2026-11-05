@@ -5,18 +5,29 @@ import { cap } from './game/calc';
 import { S, PREV, busy, rsf, setS, setPREV, setRsf, save, log, fresh, initState } from './game/state';
 import { paint, loop, G, MV, ripple } from './view/scene';
 import { ui, refresh, sheet, closeSheet, toast, crH, winterH, guideH, logH, isChoosing, resolveChoose } from './view/ui';
-import { half, spring, togglePause, toggleSpeed, startHalf } from './game/flow';
+import { half, spring, togglePause, toggleSpeed } from './game/flow';
 import { openFeedback, copySituationCode } from './feedback';
+import { unlockAudio, setSoundEnabled, isSoundEnabled, suspendAudio, resumeAudio } from './audio/audio';
 
 // 状態初期化
 initState();
 
-// タブが隠れたら一時停止する（戻ったときは一時停止のまま）
+// 最初のタップ・クリックで音声を解禁 (iPhone Safari対応)
+document.addEventListener('pointerdown', () => {
+  unlockAudio();
+}, { once: true });
+
+// タブが隠れたら音を止め、一時停止する（戻ったときは一時停止のまま）
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden && S.clock && !S.clock.paused && S.phase === 'play') {
-    S.clock.paused = true;
-    save();
-    ui();
+  if (document.hidden) {
+    suspendAudio();
+    if (S.clock && !S.clock.paused && S.phase === 'play') {
+      S.clock.paused = true;
+      save();
+      ui();
+    }
+  } else {
+    resumeAudio();
   }
 });
 
@@ -74,6 +85,16 @@ document.addEventListener('click', (e) => {
   }
   if (d.a === 'toggle-speed') {
     toggleSpeed();
+    return;
+  }
+  if (d.a === 'toggle-sound') {
+    const nextState = !isSoundEnabled();
+    setSoundEnabled(nextState);
+    if (!S.settings) S.settings = { sound: true };
+    S.settings.sound = nextState;
+    save();
+    ui();
+    toast(nextState ? '音をオンにしました' : '音を消音にしました');
     return;
   }
   if (d.a === 'winter') return sheet(winterH());

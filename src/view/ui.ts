@@ -4,10 +4,12 @@ import { dodge, E, cap, tad } from '../game/calc';
 import { art, paint } from './scene';
 import { SHOP } from '../data/shop';
 import { getSeasonInfo } from '../game/clock';
+import { isSoundEnabled } from '../audio/audio';
 
 let SR: (() => void) | null = null;
 let CH: ((idx: number) => void) | null = null;
 let tt: any;
+let bannerTimer: any;
 
 function getEl<T extends HTMLElement | SVGElement>(id: string): T {
   const el = document.getElementById(id);
@@ -28,11 +30,36 @@ export function resolveChoose(idx: number): void {
 }
 
 export function toast(m: string): void {
+  if (typeof document === 'undefined') return;
   const t = getEl<HTMLElement>('toast');
   t.textContent = m;
   t.classList.add('on');
   clearTimeout(tt);
   tt = setTimeout(() => t.classList.remove('on'), 2600);
+}
+
+/**
+ * 眺める出来事のバナー通知 (2〜4秒、タップで消せる)
+ */
+export function showWatchBanner(title: string, text: string): void {
+  let banner = document.getElementById('watch-banner');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'watch-banner';
+    banner.className = 'watch-banner';
+    document.body.appendChild(banner);
+    banner.addEventListener('click', () => {
+      banner?.classList.remove('on');
+      clearTimeout(bannerTimer);
+    });
+  }
+
+  banner.innerHTML = '<b>' + E(title) + '</b><p>' + E(text) + '</p><small>タップで閉じる</small>';
+  banner.classList.add('on');
+  clearTimeout(bannerTimer);
+  bannerTimer = setTimeout(() => {
+    banner?.classList.remove('on');
+  }, 3500);
 }
 
 export function sheet(h: string): void {
@@ -128,7 +155,6 @@ export function ui(): void {
   const n = S.tc + S.wc;
   const wp = n ? Math.round((S.wc / n) * 100) : 50;
 
-  // 季節と進行度 (フェーズ2A: 時計連動)
   let seasonLabel = S.phase === 'winter' ? '冬' : S.h ? '秋冬' : '春夏';
   let progressPct = 0;
   let isClockPaused = false;
@@ -141,6 +167,8 @@ export function ui(): void {
     isClockPaused = S.clock.paused;
     clockSpeed = S.clock.speed;
   }
+
+  const soundOn = isSoundEnabled();
 
   getEl<HTMLElement>('hud').innerHTML =
     '<span class="pill">' +
@@ -157,6 +185,9 @@ export function ui(): void {
     '円 / 養分' +
     S.nut +
     '</span>' +
+    '<button class="sound-btn" data-a="toggle-sound" aria-label="音の切り替え">' +
+    (soundOn ? '🔊' : '🔇') +
+    '</button>' +
     (S.clock && S.phase === 'play' && S.clock.totalSec > 0
       ? '<div class="season-bar" style="width:100%"><div class="season-bar-fill" style="width:' +
         progressPct +
@@ -196,7 +227,6 @@ export function ui(): void {
       : '場面での選択が、この田んぼのスタイルをつくります。') +
     '</p></div>';
 
-  // ドックのレンダリング (半期開始前か時間進行中かで安全に切り替え)
   if (S.phase === 'winter') {
     getEl<HTMLElement>('dock').innerHTML =
       '<button class="go" data-a="winter">冬のじかんを開く</button>';

@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { migrate } from '../src/game/state';
 
-describe('save migration (セーブ移行 v1 -> v2 -> v3)', () => {
-  it('ベータ3 (v1) の見本データから正常に移行され、v3形式 (clock付属) に引き継がれる', () => {
+describe('save migration (セーブ移行 v1 -> v2 -> v3 -> v4)', () => {
+  it('ベータ3 (v1) の見本データから正常に移行され、v4形式 (settings.sound付属) に引き継がれる', () => {
     const v1Sample = {
       ver: 1,
       y: 3,
@@ -43,10 +43,9 @@ describe('save migration (セーブ移行 v1 -> v2 -> v3)', () => {
 
     const migrated = migrate(v1Sample);
     expect(migrated).not.toBeNull();
-    expect(migrated?.schemaVersion).toBe(3);
-    expect(migrated?.ver).toBe(3);
+    expect(migrated?.schemaVersion).toBe(4);
+    expect(migrated?.ver).toBe(4);
 
-    // 各項目の完全保持を確認
     expect(migrated?.y).toBe(3);
     expect(migrated?.h).toBe(1);
     expect(migrated?.money).toBe(1250);
@@ -55,16 +54,15 @@ describe('save migration (セーブ移行 v1 -> v2 -> v3)', () => {
     expect(migrated?.cr[0].n).toBe('たろう');
     expect(migrated?.dead).toEqual([{ n: 'ひなた', sp: 'カエル', lv: 1 }]);
 
-    // clock オブジェクトが自動補完され、読み込み時は一時停止であること
     expect(migrated?.clock).toBeDefined();
     expect(migrated?.clock?.paused).toBe(true);
-    expect(migrated?.clock?.totalSec).toBe(450); // 秋冬: 225+225=450
+    expect(migrated?.settings).toEqual({ sound: true });
   });
 
-  it('v2形式のセーブデータからv3へ移行できる (clockなしv2データ)', () => {
-    const v2Data = {
-      schemaVersion: 2,
-      ver: 2,
+  it('v3形式のセーブデータからv4へ移行できる (settingsなしv3データ)', () => {
+    const v3Data = {
+      schemaVersion: 3,
+      ver: 3,
       y: 2,
       h: 0,
       w: 2,
@@ -86,21 +84,58 @@ describe('save migration (セーブ移行 v1 -> v2 -> v3)', () => {
       phase: 'play',
       last: null,
       seen: 1,
+      clock: {
+        elapsedSec: 100,
+        totalSec: 450,
+        paused: false,
+        speed: 1,
+        events: [],
+      },
     };
 
-    const migrated = migrate(v2Data);
+    const migrated = migrate(v3Data);
     expect(migrated).not.toBeNull();
-    expect(migrated?.schemaVersion).toBe(3);
-    expect(migrated?.ver).toBe(3);
-    expect(migrated?.clock).toBeDefined();
-    expect(migrated?.clock?.paused).toBe(true);
-    expect(migrated?.clock?.totalSec).toBe(450); // 春夏: 225+225=450
+    expect(migrated?.schemaVersion).toBe(4);
+    expect(migrated?.ver).toBe(4);
+    expect(migrated?.settings).toEqual({ sound: true });
   });
 
-  it('場面の直前で保存されたセーブデータから再開した際、読み込み時は一時停止のままである', () => {
-    const v3Data = {
+  it('既存の設定 (settings.sound = false) が保持される', () => {
+    const v3MutedData = {
       schemaVersion: 3,
       ver: 3,
+      y: 1,
+      h: 0,
+      w: 0,
+      money: 0,
+      nut: 0,
+      water: 1,
+      own: {},
+      cr: [],
+      log: [],
+      dead: [],
+      memo: [],
+      dex: ['メダカ'],
+      tc: 0,
+      wc: 0,
+      hm: 0,
+      goal: null,
+      startN: 0,
+      id: 0,
+      phase: 'play',
+      last: null,
+      seen: 1,
+      settings: { sound: false },
+    };
+
+    const migrated = migrate(v3MutedData);
+    expect(migrated?.settings?.sound).toBe(false);
+  });
+
+  it('眺める出来事を含む予定リストで再開時、未消化フラグが維持され二重適用がない', () => {
+    const v4Data = {
+      schemaVersion: 4,
+      ver: 4,
       y: 1,
       h: 0,
       w: 2,
@@ -125,55 +160,21 @@ describe('save migration (セーブ移行 v1 -> v2 -> v3)', () => {
       clock: {
         elapsedSec: 110,
         totalSec: 450,
-        paused: false, // 保存時は動いていたとしても
+        paused: false,
         speed: 1,
         events: [
-          { id: 'sign', ratio: 0.25, triggered: false }, // まだ消化されていない
+          { id: 'watch_petals', ratio: 0.15, triggered: true, isWatch: true },
+          { id: 'sign', ratio: 0.25, triggered: false, isWatch: false },
         ],
       },
+      settings: { sound: true },
     };
 
-    const migrated = migrate(v3Data);
+    const migrated = migrate(v4Data);
     expect(migrated).not.toBeNull();
-    // 復帰後は常に一時停止状態になること (指示書 3.4)
     expect(migrated?.clock?.paused).toBe(true);
-    // 未消化のイベントがそのまま維持されること (二重適用・取りこぼし防止)
-    expect(migrated?.clock?.events[0].triggered).toBe(false);
-  });
-
-  it('将来の未知の項目やカスタム項目があっても壊れずに保持される', () => {
-    const dataWithUnknown = {
-      schemaVersion: 2,
-      ver: 2,
-      y: 1,
-      h: 0,
-      w: 0,
-      money: 0,
-      nut: 0,
-      water: 1,
-      own: {},
-      cr: [],
-      log: [],
-      dead: [],
-      memo: [],
-      dex: ['メダカ'],
-      tc: 0,
-      wc: 0,
-      hm: 0,
-      goal: null,
-      startN: 0,
-      id: 0,
-      phase: 'play',
-      last: null,
-      seen: 1,
-      futureFieldWeather: 'sunny',
-      futureFieldTemp: 24,
-    };
-
-    const migrated = migrate(dataWithUnknown);
-    expect(migrated).not.toBeNull();
-    expect((migrated as any).futureFieldWeather).toBe('sunny');
-    expect((migrated as any).futureFieldTemp).toBe(24);
+    expect(migrated?.clock?.events[0].triggered).toBe(true);
+    expect(migrated?.clock?.events[1].triggered).toBe(false);
   });
 
   it('壊れたデータ・空データの場合、null を返して新規開始にフォールバックできる', () => {

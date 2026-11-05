@@ -1,6 +1,6 @@
-:root{--bg:#e6efe9;--card:#fbfdfb;--tx:#1d3330;--mu:#5b736d;--ac:#2c7a68;--on:#fff;--bd:#c3d5cd;--bad:#b0483a;--wd:#a07b45;--sh:rgba(20,50,45,.14);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111a17;--card:#1b2724;--tx:#e3eeea;--mu:#93aaa4;--ac:#6fc4ae;--on:#0f1c19;--bd:#2e3f3a;--bad:#e5897b;--wd:#c9a36a;--sh:rgba(0,0,0,.4)}}
 :root[data-theme="dark"]{--bg:#111a17;--card:#1b2724;--tx:#e3eeea;--mu:#93aaa4;--ac:#6fc4ae;--on:#0f1c19;--bd:#2e3f3a;--bad:#e5897b;--wd:#c9a36a;--sh:rgba(0,0,0,.4)}
+:root{--bg:#e6efe9;--card:#fbfdfb;--tx:#1d3330;--mu:#5b736d;--ac:#2c7a68;--on:#fff;--bd:#c3d5cd;--bad:#b0483a;--wd:#a07b45;--sh:rgba(20,50,45,.14);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.55 -apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;-webkit-user-select:none;user-select:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 input{-webkit-user-select:text;user-select:text;font:inherit}
@@ -42,10 +42,20 @@ button small{display:block;font-size:12px;opacity:.85;line-height:1.3}
 @media(prefers-reduced-motion:reduce){.cl,.bug{animation:none}}
 #nk{transform-origin:-8px -44px}
 
-/* フェーズ2A: 時間駆動・時計UI */
+/* 時間駆動・時計UI */
 .season-bar{height:6px;background:var(--bd);border-radius:3px;overflow:hidden;margin:6px 0 2px}
 .season-bar-fill{height:100%;background:var(--ac);transition:width .2s linear}
 .clock-dock{display:flex;gap:10px;align-items:center;max-width:520px;margin:0 auto}
 .clock-btn{flex:1;min-height:50px;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px}
 .speed-btn{flex:0 0 76px;min-height:50px;font-size:15px;font-weight:700}
 .pause-indicator{font-size:12px;color:var(--bad);font-weight:700;display:inline-block;margin-left:6px}
+
+/* 音切り替えボタン (44px以上確保) */
+.sound-btn{min-width:44px;min-height:44px;padding:4px 8px;font-size:18px;border-radius:10px;background:transparent;border:1px solid var(--bd);display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+
+/* 眺める出来事バナー (2〜4秒通知、タップで消せる) */
+.watch-banner{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));left:50%;transform:translate(-50%,-20px);width:calc(100% - 28px);max-width:480px;background:var(--card);border:2px solid var(--ac);border-radius:14px;padding:12px 14px;box-shadow:0 4px 18px var(--sh);opacity:0;pointer-events:none;transition:transform .25s ease-out,opacity .25s ease-out;z-index:30;cursor:pointer}
+.watch-banner.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.watch-banner b{display:block;font-size:14px;color:var(--ac);margin-bottom:2px}
+.watch-banner p{margin:0;font-size:13px;color:var(--tx);line-height:1.4}
+.watch-banner small{display:block;font-size:11px;color:var(--mu);margin-top:4px;text-align:right}

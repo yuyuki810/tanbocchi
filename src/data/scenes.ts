@@ -4,8 +4,9 @@ import { SP } from './species';
 import { add, log } from '../game/state';
 import { strike, party, paint } from '../view/scene';
 import { toast, ask } from '../view/ui';
+import { WEATHER_CHOICE_EVENTS } from './weatherEvents';
 
-export const SCENE_DEFS: Record<string, SceneDef> = {
+export const BASE_SCENE_DEFS: Record<string, SceneDef> = {
   sign: {
     id: 'sign',
     title: 'サギの気配',
@@ -209,4 +210,10 @@ export const SCENE_DEFS: Record<string, SceneDef> = {
       },
     ],
   },
+};
+
+// 新しい天気・季節の選ぶ出来事 (5個) をマージ
+export const SCENE_DEFS: Record<string, SceneDef> = {
+  ...BASE_SCENE_DEFS,
+  ...WEATHER_CHOICE_EVENTS,
 };

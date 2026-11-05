@@ -1,14 +1,18 @@
 import { S, setPREV, setBusy, save, log, busy } from './state';
 import { yo, R, sl, E } from './calc';
 import { paint, party, RM, art } from '../view/scene';
-import { ui, sheet, winterH, ask, toast, isChoosing } from '../view/ui';
-import { plan, play, goalScene } from './scenes';
+import { ui, sheet, winterH, ask, toast, isChoosing, showWatchBanner } from '../view/ui';
+import { plan, play, goalScene, planWatchEvents } from './scenes';
 import { checkEvolution } from '../data/evolution';
-import { initClockState, advanceClock, getDebugSpeedMultiplier, getSeasonInfo } from './clock';
+import { initClockState, advanceClock, getDebugSpeedMultiplier, getSeasonInfo, POSITION_TO_RATIO_MAP } from './clock';
 import { SEASON_SECONDS } from '../data/timing';
+import { WATCH_EVENTS } from '../data/weatherEvents';
+import { updateSeasonAmbient, pauseAmbient, resumeAmbient, playSfx } from '../audio/audio';
+import { SeasonName } from '../types';
 
 let autoSaveTimer = 0;
 let isSceneActive = false;
+let lastSeason: SeasonName | null = null;
 
 export function isBusyPlaying(): boolean {
   return isSceneActive;
@@ -28,12 +32,24 @@ export async function startHalf(): Promise<void> {
     await goalScene();
   }
 
-  // 場面計画: 乱数消費順は変更前と完全に同一
+  // 1. 選ぶ場面の計画
   const pl = plan(h);
 
+  // 2. 選ぶ場面の占有比率を抽出
+  const occupiedRatios = Object.keys(pl).map((pos) => POSITION_TO_RATIO_MAP[Number(pos)] ?? 0.5);
+
+  // 3. 眺める出来事のスケジューリング (春夏2回、秋冬2回)
+  const watchEvts = planWatchEvents(h, occupiedRatios);
+
   // 時計の初期化 (開始時は動かす)
-  S.clock = initClockState(h, pl, SEASON_SECONDS, false, S.clock?.speed || 1);
+  S.clock = initClockState(h, pl, SEASON_SECONDS, false, S.clock?.speed || 1, watchEvts);
   syncWeekWithClock();
+
+  // 環境音の初期化 (春または秋)
+  const info = getSeasonInfo(h, S.clock.elapsedSec);
+  lastSeason = info.season;
+  updateSeasonAmbient(info.season);
+
   paint();
   ui();
   save();
@@ -41,16 +57,14 @@ export async function startHalf(): Promise<void> {
 }
 
 /**
- * 時計の進行に合わせて S.w (週番号 0..12) を同期する (稲の成長や既存描画のため)
+ * 時計の進行に合わせて S.w (週番号 0..12) を同期する
  */
 export function syncWeekWithClock(): void {
   if (!S.clock) return;
   const progress = S.clock.totalSec > 0 ? S.clock.elapsedSec / S.clock.totalSec : 0;
   if (S.h === 0) {
-    // 春夏: 0〜7週
     S.w = Math.min(7, Math.floor(progress * 8));
   } else {
-    // 秋冬: 8〜11週
     S.w = Math.min(11, 8 + Math.floor(progress * 4));
   }
 }
@@ -68,6 +82,12 @@ export async function tickClock(dtMs: number): Promise<void> {
 
   syncWeekWithClock();
 
+  // 季節が切り替わったら環境音をクロスフェード (約2秒)
+  if (lastSeason !== res.season) {
+    lastSeason = res.season;
+    updateSeasonAmbient(res.season);
+  }
+
   // 10秒ごとの定期自動セーブ
   autoSaveTimer += res.deltaSec;
   if (autoSaveTimer >= 10) {
@@ -75,24 +95,36 @@ export async function tickClock(dtMs: number): Promise<void> {
     save();
   }
 
-  // 場面が発火した場合
+  // 出来事の発火チェック
   if (res.firedEvent) {
-    isSceneActive = true;
-    save();
-    try {
-      await play(res.firedEvent.id);
-    } finally {
-      isSceneActive = false;
-      if (S.clock) {
-        S.clock.activeSceneId = undefined;
-        // 場面解決後は時計を再開する (指示書 3.2)
-        S.clock.paused = false;
+    if (res.firedEvent.isWatch) {
+      // --- 眺める出来事 (時間を止めない) ---
+      const watchDef = WATCH_EVENTS[res.firedEvent.id];
+      if (watchDef) {
+        watchDef.apply(S, () => Math.random());
+        playSfx('watch');
+        showWatchBanner(watchDef.title, watchDef.text);
+        paint();
+        ui();
       }
+    } else {
+      // --- 選ぶ場面 (時計を一時停止して選択ダイアログ) ---
+      isSceneActive = true;
       save();
-      paint();
-      ui();
+      try {
+        await play(res.firedEvent.id);
+      } finally {
+        isSceneActive = false;
+        if (S.clock) {
+          S.clock.activeSceneId = undefined;
+          S.clock.paused = false; // 場面解決後に再開
+        }
+        save();
+        paint();
+        ui();
+      }
+      return;
     }
-    return;
   }
 
   // 半期末に到達した場合
@@ -107,6 +139,9 @@ export async function tickClock(dtMs: number): Promise<void> {
 export async function finishHalf(): Promise<void> {
   if (busy || S.phase !== 'play') return;
   setBusy(true);
+
+  // 環境音の停止
+  pauseAmbient();
 
   const h = S.h;
   const to = h ? 12 : 8;
@@ -142,7 +177,10 @@ export async function finishHalf(): Promise<void> {
   S.h = 1;
   // 秋冬用の時計を初期化 (停止中)
   const nextPl = plan(1);
-  S.clock = initClockState(1, nextPl, SEASON_SECONDS, true, S.clock?.speed || 1);
+  const nextOccupied = Object.keys(nextPl).map((pos) => POSITION_TO_RATIO_MAP[Number(pos)] ?? 0.5);
+  const nextWatch = planWatchEvents(1, nextOccupied);
+  S.clock = initClockState(1, nextPl, SEASON_SECONDS, true, S.clock?.speed || 1, nextWatch);
+
   paint();
   save();
 
@@ -169,6 +207,11 @@ export async function finishHalf(): Promise<void> {
 export function togglePause(): void {
   if (!S.clock || S.phase !== 'play' || isSceneActive) return;
   S.clock.paused = !S.clock.paused;
+  if (S.clock.paused) {
+    pauseAmbient();
+  } else {
+    resumeAmbient();
+  }
   save();
   ui();
 }
@@ -183,7 +226,7 @@ export function toggleSpeed(): void {
 }
 
 /**
- * 既存の half() 互換エントリポイント
+ * 半期の進行・再開
  */
 export async function half(): Promise<void> {
   if (!S.clock || S.clock.events.length === 0 || S.clock.elapsedSec >= S.clock.totalSec) {
@@ -254,7 +297,9 @@ export function spring(): void {
 
   // 春夏用の時計を初期化 (停止中)
   const pl = plan(0);
-  S.clock = initClockState(0, pl, SEASON_SECONDS, true, S.clock?.speed || 1);
+  const occupied = Object.keys(pl).map((pos) => POSITION_TO_RATIO_MAP[Number(pos)] ?? 0.5);
+  const watchEvts = planWatchEvents(0, occupied);
+  S.clock = initClockState(0, pl, SEASON_SECONDS, true, S.clock?.speed || 1, watchEvts);
 
   log('春になった。新しい一年がはじまる。');
   save();

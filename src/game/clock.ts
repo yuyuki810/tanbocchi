@@ -1,6 +1,5 @@
-import { ClockState, ScheduledEvent, SeasonName, GameState } from '../types';
+import { ClockState, ScheduledEvent, SeasonName } from '../types';
 import { SEASON_SECONDS, MAX_FRAME_MS } from '../data/timing';
-import { plan } from './scenes';
 
 /**
  * URLクエリパラメータからデバッグ倍速 (?speed=N) を取得する (1〜20)
@@ -46,21 +45,32 @@ export const POSITION_TO_RATIO_MAP: Record<number, number> = {
 
 /**
  * 半期の開始時に予定場面リストを生成する
- * 乱数消費順は既存の plan(h) と完全に同一
  */
 export function createScheduledEvents(
   h: number,
-  planMap: Record<number, string>
+  planMap: Record<number, string>,
+  watchEvents: Array<{ id: string; ratio: number }> = []
 ): ScheduledEvent[] {
   const positions = Object.keys(planMap)
     .map(Number)
     .sort((a, b) => a - b);
 
-  return positions.map((pos) => ({
+  const choiceEvents: ScheduledEvent[] = positions.map((pos) => ({
     id: planMap[pos],
     ratio: POSITION_TO_RATIO_MAP[pos] ?? 0.5,
     triggered: false,
+    isWatch: false,
   }));
+
+  const watchList: ScheduledEvent[] = watchEvents.map((w) => ({
+    id: w.id,
+    ratio: w.ratio,
+    triggered: false,
+    isWatch: true,
+  }));
+
+  // すべての出来事を発生時刻 (ratio) 順にソート
+  return [...choiceEvents, ...watchList].sort((a, b) => a.ratio - b.ratio);
 }
 
 /**
@@ -71,14 +81,15 @@ export function initClockState(
   planMap: Record<number, string>,
   seasonSec: Record<SeasonName, number> = SEASON_SECONDS,
   paused = false,
-  speed = 1
+  speed = 1,
+  watchEvents: Array<{ id: string; ratio: number }> = []
 ): ClockState {
   return {
     elapsedSec: 0,
     totalSec: getHalfTotalSec(h, seasonSec),
     paused,
     speed,
-    events: createScheduledEvents(h, planMap),
+    events: createScheduledEvents(h, planMap, watchEvents),
   };
 }
 
@@ -180,7 +191,10 @@ export function advanceClock(
   for (const evt of clock.events) {
     if (!evt.triggered && info.halfProgress >= evt.ratio) {
       evt.triggered = true;
-      clock.paused = true; // 場面発生で時計を一時停止
+      if (!evt.isWatch) {
+        // 選ぶ場面のみ時計を一時停止する (眺める出来事は時間を止めない)
+        clock.paused = true;
+      }
       firedEvent = evt;
       clock.activeSceneId = evt.id;
       break; // 1回に進める場面は1つ
