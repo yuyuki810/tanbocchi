@@ -78,6 +78,24 @@ export interface OwnItems {
   [key: string]: number | undefined;
 }
 
+// 時計・時間駆動用型（フェーズ2A追加）
+export type SeasonName = '春' | '夏' | '秋' | '冬';
+
+export interface ScheduledEvent {
+  id: string;         // 場面ID
+  ratio: number;      // 半期内の発生時刻の割合 (0〜1)
+  triggered: boolean; // 発火済みか
+}
+
+export interface ClockState {
+  elapsedSec: number;        // 現在の半期内の経過秒
+  totalSec: number;          // 現在の半期の合計秒
+  paused: boolean;           // 一時停止中か
+  speed: number;             // 倍速 (1 or 2)
+  events: ScheduledEvent[];  // 予定場面リスト
+  activeSceneId?: string;    // 場面実行中の場合の場面ID
+}
+
 export interface GameState {
   schemaVersion: number;
   ver: number;
@@ -102,6 +120,7 @@ export interface GameState {
   phase: GamePhase;
   last: HarvestResult | null;
   seen: number;
+  clock?: ClockState; // フェーズ2Aで追加 (セーブv3)
   [key: string]: any; // 未知の項目を保持
 }
 

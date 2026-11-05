@@ -1,10 +1,190 @@
 import { S, setPREV, setBusy, save, log, busy } from './state';
 import { yo, R, sl, E } from './calc';
 import { paint, party, RM, art } from '../view/scene';
-import { ui, sheet, winterH, ask, toast } from '../view/ui';
+import { ui, sheet, winterH, ask, toast, isChoosing } from '../view/ui';
 import { plan, play, goalScene } from './scenes';
 import { checkEvolution } from '../data/evolution';
+import { initClockState, advanceClock, getDebugSpeedMultiplier, getSeasonInfo } from './clock';
+import { SEASON_SECONDS } from '../data/timing';
 
+let autoSaveTimer = 0;
+let isSceneActive = false;
+
+export function isBusyPlaying(): boolean {
+  return isSceneActive;
+}
+
+/**
+ * 新しい半期を開始する
+ */
+export async function startHalf(): Promise<void> {
+  if (busy || S.phase !== 'play') return;
+  setBusy(true);
+  setPREV(JSON.stringify(S));
+  ui();
+
+  const h = S.h;
+  if (!h && !S.goal) {
+    await goalScene();
+  }
+
+  // 場面計画: 乱数消費順は変更前と完全に同一
+  const pl = plan(h);
+
+  // 時計の初期化 (開始時は動かす)
+  S.clock = initClockState(h, pl, SEASON_SECONDS, false, S.clock?.speed || 1);
+  syncWeekWithClock();
+  paint();
+  ui();
+  save();
+  setBusy(false);
+}
+
+/**
+ * 時計の進行に合わせて S.w (週番号 0..12) を同期する (稲の成長や既存描画のため)
+ */
+export function syncWeekWithClock(): void {
+  if (!S.clock) return;
+  const progress = S.clock.totalSec > 0 ? S.clock.elapsedSec / S.clock.totalSec : 0;
+  if (S.h === 0) {
+    // 春夏: 0〜7週
+    S.w = Math.min(7, Math.floor(progress * 8));
+  } else {
+    // 秋冬: 8〜11週
+    S.w = Math.min(11, 8 + Math.floor(progress * 4));
+  }
+}
+
+/**
+ * 毎フレーム呼ばれる時計の進行ハンドラ
+ */
+export async function tickClock(dtMs: number): Promise<void> {
+  if (S.phase !== 'play' || !S.clock || S.clock.paused || isSceneActive || isChoosing()) {
+    return;
+  }
+
+  const debugMultiplier = getDebugSpeedMultiplier();
+  const res = advanceClock(S.clock, S.h, dtMs, SEASON_SECONDS, debugMultiplier);
+
+  syncWeekWithClock();
+
+  // 10秒ごとの定期自動セーブ
+  autoSaveTimer += res.deltaSec;
+  if (autoSaveTimer >= 10) {
+    autoSaveTimer = 0;
+    save();
+  }
+
+  // 場面が発火した場合
+  if (res.firedEvent) {
+    isSceneActive = true;
+    save();
+    try {
+      await play(res.firedEvent.id);
+    } finally {
+      isSceneActive = false;
+      if (S.clock) {
+        S.clock.activeSceneId = undefined;
+        // 場面解決後は時計を再開する (指示書 3.2)
+        S.clock.paused = false;
+      }
+      save();
+      paint();
+      ui();
+    }
+    return;
+  }
+
+  // 半期末に到達した場合
+  if (res.completed) {
+    await finishHalf();
+  }
+}
+
+/**
+ * 半期の終了処理
+ */
+export async function finishHalf(): Promise<void> {
+  if (busy || S.phase !== 'play') return;
+  setBusy(true);
+
+  const h = S.h;
+  const to = h ? 12 : 8;
+  S.w = to;
+  S.water = 1;
+
+  S.cr.forEach((c) => {
+    c.age++;
+    c.lv = Math.min(9, c.lv + 1);
+  });
+
+  // 進化ルール（変身）の適用チェック
+  const transformedCreatures: typeof S.cr = [];
+  for (const c of S.cr) {
+    const evo = checkEvolution(c, '変身', S);
+    if (evo) {
+      if (evo.to) c.sp = evo.to;
+      if (evo.apply) evo.apply(c, S);
+      transformedCreatures.push(c);
+    }
+  }
+
+  if (h) {
+    harvest();
+    S.phase = 'winter';
+    paint();
+    save();
+    setBusy(false);
+    ui();
+    return sheet(winterH());
+  }
+
+  S.h = 1;
+  // 秋冬用の時計を初期化 (停止中)
+  const nextPl = plan(1);
+  S.clock = initClockState(1, nextPl, SEASON_SECONDS, true, S.clock?.speed || 1);
+  paint();
+  save();
+
+  for (const c of transformedCreatures) {
+    party();
+    await ask(
+      '<h2>' +
+        E(c.n) +
+        'が変身した!</h2><svg viewBox="-30 -18 60 36" style="width:140px;margin:0 auto">' +
+        art(c) +
+        '</svg><p>オタマジャクシから、立派なカエルになった。</p><button class="go" data-a="close">おめでとう</button>'
+    );
+  }
+
+  log('夏が終わった。稲が実りはじめた。');
+  toast('夏が終わった。稲が実りはじめた');
+  setBusy(false);
+  ui();
+}
+
+/**
+ * 一時停止のトグル
+ */
+export function togglePause(): void {
+  if (!S.clock || S.phase !== 'play' || isSceneActive) return;
+  S.clock.paused = !S.clock.paused;
+  save();
+  ui();
+}
+
+/**
+ * 倍速の切り替え (1x / 2x)
+ */
+export function toggleSpeed(): void {
+  if (!S.clock) return;
+  S.clock.speed = S.clock.speed === 1 ? 2 : 1;
+  ui();
+}
+
+/**
+ * 既存の half() 互換エントリポイント
+ */
 export async function half(): Promise<void> {
   if (!S.clock || S.clock.events.length === 0 || S.clock.elapsedSec >= S.clock.totalSec) {
     await startHalf();
@@ -71,6 +251,11 @@ export function spring(): void {
   S.startN = S.cr.length;
   S.water = 1;
   S.phase = 'play';
+
+  // 春夏用の時計を初期化 (停止中)
+  const pl = plan(0);
+  S.clock = initClockState(0, pl, SEASON_SECONDS, true, S.clock?.speed || 1);
+
   log('春になった。新しい一年がはじまる。');
   save();
   paint();

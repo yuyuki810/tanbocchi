@@ -5,11 +5,20 @@ import { cap } from './game/calc';
 import { S, PREV, busy, rsf, setS, setPREV, setRsf, save, log, fresh, initState } from './game/state';
 import { paint, loop, G, MV, ripple } from './view/scene';
 import { ui, refresh, sheet, closeSheet, toast, crH, winterH, guideH, logH, isChoosing, resolveChoose } from './view/ui';
-import { half, spring } from './game/flow';
+import { half, spring, togglePause, toggleSpeed, startHalf } from './game/flow';
 import { openFeedback, copySituationCode } from './feedback';
 
 // 状態初期化
 initState();
+
+// タブが隠れたら一時停止する（戻ったときは一時停止のまま）
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && S.clock && !S.clock.paused && S.phase === 'play') {
+    S.clock.paused = true;
+    save();
+    ui();
+  }
+});
 
 // イベント登録
 document.addEventListener('click', (e) => {
@@ -56,7 +65,17 @@ document.addEventListener('click', (e) => {
     return sheet(winterH());
   }
 
-  if (d.a === 'half') return half();
+  if (d.a === 'half') {
+    return half();
+  }
+  if (d.a === 'toggle-pause') {
+    togglePause();
+    return;
+  }
+  if (d.a === 'toggle-speed') {
+    toggleSpeed();
+    return;
+  }
   if (d.a === 'winter') return sheet(winterH());
   if (d.a === 'spring') {
     closeSheet();

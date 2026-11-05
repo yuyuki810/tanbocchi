@@ -5,8 +5,8 @@
 html,body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.55 -apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;-webkit-user-select:none;user-select:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 input{-webkit-user-select:text;user-select:text;font:inherit}
 #app{max-width:520px;margin:0 auto;padding:10px 12px 120px}
-.hud{display:flex;align-items:center;gap:10px;padding:4px 2px 10px}
-.pill{background:var(--ac);color:var(--on);border-radius:999px;padding:3px 12px;font-weight:700;white-space:nowrap}
+.hud{display:flex;align-items:center;gap:10px;padding:4px 2px 10px;flex-wrap:wrap}
+.pill{background:var(--ac);color:var(--on);border-radius:999px;padding:3px 12px;font-weight:700;white-space:nowrap;display:inline-flex;align-items:center}
 .dots{flex:1;display:flex;gap:3px}.dots i{flex:1;height:6px;border-radius:3px;background:var(--bd)}.dots i.d{background:var(--ac)}
 .mu{color:var(--mu);font-size:13px}
 .stage{position:relative;border-radius:18px;overflow:hidden;box-shadow:0 3px 14px var(--sh)}
@@ -41,3 +41,11 @@ button small{display:block;font-size:12px;opacity:.85;line-height:1.3}
 @keyframes fly{0%,100%{transform:translate(40px,80px)}33%{transform:translate(180px,52px)}66%{transform:translate(310px,92px)}}
 @media(prefers-reduced-motion:reduce){.cl,.bug{animation:none}}
 #nk{transform-origin:-8px -44px}
+
+/* フェーズ2A: 時間駆動・時計UI */
+.season-bar{height:6px;background:var(--bd);border-radius:3px;overflow:hidden;margin:6px 0 2px}
+.season-bar-fill{height:100%;background:var(--ac);transition:width .2s linear}
+.clock-dock{display:flex;gap:10px;align-items:center;max-width:520px;margin:0 auto}
+.clock-btn{flex:1;min-height:50px;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px}
+.speed-btn{flex:0 0 76px;min-height:50px;font-size:15px;font-weight:700}
+.pause-indicator{font-size:12px;color:var(--bad);font-weight:700;display:inline-block;margin-left:6px}

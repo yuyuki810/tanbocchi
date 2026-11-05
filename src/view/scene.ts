@@ -1,14 +1,18 @@
 import { Creature, CreatureMove, Rng } from '../types';
 import { S, log } from '../game/state';
 import { dodge, surf, tad, R, sl, E, random } from '../game/calc';
-import { SKY } from '../data/sky';
+import { SKY, getInterpolatedSky } from '../data/sky';
 import { toast, ask } from './ui';
+import { getSeasonInfo } from '../game/clock';
+import { tickClock } from '../game/flow';
 
 const NS = 'http://www.w3.org/2000/svg';
 export const RM = typeof matchMedia !== 'undefined' ? matchMedia('(prefers-reduced-motion:reduce)').matches : false;
 
 export const G: Record<number, SVGGElement> = {};
 export const MV: Record<number, CreatureMove> = {};
+
+let lastFrameTime = 0;
 
 function getEl<T extends HTMLElement | SVGElement>(id: string): T {
   const el = document.getElementById(id);
@@ -31,8 +35,16 @@ export function paint(): void {
   const wi = S.w % 4;
   const A = [26, 80, 112, 124];
 
-  getEl<SVGStopElement>('s1').setAttribute('stop-color', SKY[s][0]);
-  getEl<SVGStopElement>('s2').setAttribute('stop-color', SKY[s][1]);
+  // 空色の滑らかな変化 (フェーズ2A: getInterpolatedSky)
+  if (S.clock && S.phase === 'play') {
+    const info = getSeasonInfo(S.h, S.clock.elapsedSec);
+    const [c1, c2] = getInterpolatedSky(info.season, info.seasonProgress);
+    getEl<SVGStopElement>('s1').setAttribute('stop-color', c1);
+    getEl<SVGStopElement>('s2').setAttribute('stop-color', c2);
+  } else {
+    getEl<SVGStopElement>('s1').setAttribute('stop-color', SKY[s][0]);
+    getEl<SVGStopElement>('s2').setAttribute('stop-color', SKY[s][1]);
+  }
 
   const h0 = S.phase === 'winter' ? 12 : A[s] + ((A[Math.min(s + 1, 3)] - A[s]) * wi) / 4;
   const col = ['#8fc55b', '#58a63c', '#d6b84a', '#8b7a58'][s];
@@ -136,6 +148,14 @@ export function zn(c: Creature): [number, number] {
 }
 
 export function loop(t: number): void {
+  if (!lastFrameTime) lastFrameTime = t;
+  const dtMs = t - lastFrameTime;
+  lastFrameTime = t;
+
+  // 時間駆動の時計進行
+  tickClock(dtMs);
+
+  // 生き物の泳ぎアニメーション (一時停止中も止めない)
   for (const c of S.cr) {
     const g = G[c.id];
     if (!g) continue;

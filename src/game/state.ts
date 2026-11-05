@@ -1,9 +1,11 @@
-import { GameState, SpeciesName, Rng } from '../types';
+import { GameState, SpeciesName, Rng, ClockState } from '../types';
 import { GOOD, BAD, NM } from '../data/traits';
 import { pick, random } from './calc';
+import { SEASON_SECONDS } from '../data/timing';
+import { getHalfTotalSec } from './clock';
 
 export const SAVE_KEY = 'tanbocchi';
-export const CURRENT_SCHEMA_VERSION = 2;
+export const CURRENT_SCHEMA_VERSION = 3;
 export const SAVE_VERSION = CURRENT_SCHEMA_VERSION;
 
 export let S: GameState;
@@ -30,19 +32,36 @@ export function setRsf(val: boolean): void {
 /**
  * 新しいセーブ項目を足す手順:
  * 1. src/types.ts の GameState 型に新項目を追加する（オプショナル、または既定値を用意）
- * 2. このファイルの migrations オブジェクトに移行関数を追加する (例: 2: (v2) => ({ ...v2, schemaVersion: 3, newProp: 'default' }))
- * 3. CURRENT_SCHEMA_VERSION を 1 増やす (例: 3)
+ * 2. このファイルの migrations オブジェクトに移行関数を追加する
+ * 3. CURRENT_SCHEMA_VERSION を 1 増やす
  * 4. tests/save.test.ts に移行テストを追加する
  */
 type MigrationFn = (oldData: any) => any;
 
 export const migrations: Record<number, MigrationFn> = {
-  // v1 (ベータ3) -> v2 (ベータ4 フェーズ1)
+  // v1 (ベータ3) -> v2 (ベータ4 フェーズ1: データ駆動化)
   1: (v1: any): any => {
     return {
       ...v1,
       schemaVersion: 2,
       ver: 2,
+    };
+  },
+  // v2 -> v3 (ベータ4 フェーズ2A: 時間駆動・時計)
+  2: (v2: any): any => {
+    const h = v2.h ?? 0;
+    const totalSec = getHalfTotalSec(h, SEASON_SECONDS);
+    return {
+      ...v2,
+      schemaVersion: 3,
+      ver: 3,
+      clock: v2.clock ?? {
+        elapsedSec: 0,
+        totalSec,
+        paused: true, // 読み込み時は一時停止から再開
+        speed: 1,
+        events: [],
+      },
     };
   },
 };
@@ -76,6 +95,11 @@ export function migrate(raw: any): GameState | null {
   // 最低限の必須項目の健全性チェック
   if (!Array.isArray(data.cr) || typeof data.y !== 'number') {
     return null;
+  }
+
+  // 復帰時は常に一時停止の状態で読み込む (指示書 3.4)
+  if (data.clock) {
+    data.clock.paused = true;
   }
 
   return data as GameState;
@@ -119,6 +143,7 @@ export function log(t: string): void {
 }
 
 export function fresh(): GameState {
+  const totalSec = getHalfTotalSec(0, SEASON_SECONDS);
   S = {
     schemaVersion: CURRENT_SCHEMA_VERSION,
     ver: SAVE_VERSION,
@@ -143,6 +168,13 @@ export function fresh(): GameState {
     phase: 'play',
     last: null,
     seen: 0,
+    clock: {
+      elapsedSec: 0,
+      totalSec,
+      paused: true,
+      speed: 1,
+      events: [],
+    },
   };
   add('メダカ');
   add('カエル');
